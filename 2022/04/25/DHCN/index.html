@@ -1,0 +1,307 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>DHCN-Self-Supervised Hypergraph Convolutional Networks for Session-based Recommendation(AAAI2021) | Zhenhao's Blog</title><meta name="keywords" content="推荐系统,会话推荐,对比学习,Deep Learning"><meta name="author" content="Zhenhao Li"><meta name="copyright" content="Zhenhao Li"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="目前GNN-based SBR将item transition视为成对关系，忽略了item之间复杂的高阶信息。本文将会话构建为超图，提出一种超图卷积网络改进SBR。同时设计了另一个基于超图的线图的图卷积网络，然后通过最大化两个网络学习的会话表示之间的互信息，将自监督学习集成到网络的训练中。本文来自于AAAI2021。 模型代码：https:&#x2F;&#x2F;github.com&#x2F;xiaxin1998&#x2F;DHCN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DHCN-Self-Supervised Hypergraph Convolutional Networks for Session-based Recommendation(AAAI2021)">
+<meta property="og:url" content="https://lzh66.github.io/2022/04/25/DHCN/index.html">
+<meta property="og:site_name" content="Zhenhao&#39;s Blog">
+<meta property="og:description" content="目前GNN-based SBR将item transition视为成对关系，忽略了item之间复杂的高阶信息。本文将会话构建为超图，提出一种超图卷积网络改进SBR。同时设计了另一个基于超图的线图的图卷积网络，然后通过最大化两个网络学习的会话表示之间的互信息，将自监督学习集成到网络的训练中。本文来自于AAAI2021。 模型代码：https:&#x2F;&#x2F;github.com&#x2F;xiaxin1998&#x2F;DHCN">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+<meta property="article:published_time" content="2022-04-25T07:05:43.000Z">
+<meta property="article:modified_time" content="2022-04-25T08:08:14.957Z">
+<meta property="article:author" content="Zhenhao Li">
+<meta property="article:tag" content="推荐系统">
+<meta property="article:tag" content="会话推荐">
+<meta property="article:tag" content="对比学习">
+<meta property="article:tag" content="Deep Learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lzh66.github.io/2022/04/25/DHCN/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'DHCN-Self-Supervised Hypergraph Convolutional Networks for Session-based Recommendation(AAAI2021)',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-04-25 16:08:14'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lzh66/coding@master/custom.css"><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.1.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://s2.loli.net/2022/04/22/IpxyD1gF2VqmwQB.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://w.wallhaven.cc/full/dp/wallhaven-dpzww3.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Zhenhao's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">DHCN-Self-Supervised Hypergraph Convolutional Networks for Session-based Recommendation(AAAI2021)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-04-25T07:05:43.000Z" title="Created 2022-04-25 15:05:43">2022-04-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2022-04-25T08:08:14.957Z" title="Updated 2022-04-25 16:08:14">2022-04-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Recommendation-System/">Recommendation System</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="DHCN-Self-Supervised Hypergraph Convolutional Networks for Session-based Recommendation(AAAI2021)"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>目前GNN-based SBR将item transition视为成对关系，忽略了item之间复杂的高阶信息。本文将会话构建为超图，提出一种超图卷积网络改进SBR。同时设计了另一个基于超图的线图的图卷积网络，然后通过最大化两个网络学习的会话表示之间的互信息，将自监督学习集成到网络的训练中。本文来自于AAAI2021。</p>
+<p>模型代码：<a target="_blank" rel="noopener" href="https://github.com/xiaxin1998/DHCN">https://github.com/xiaxin1998/DHCN</a></p>
+<h3 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h3><p><script type="math/tex">I=\left\{i_{1}, i_{2}, i_{3}, \ldots, i_{N}\right\}</script>代表item集合，<script type="math/tex">N</script>是item数量。每个会话可以表示成<script type="math/tex">s=\left[i_{s, 1}, i_{s, 2}, i_{s, 3}, \ldots, i_{s, m}\right]</script>，SBR就是在给定会话$s$的情况下预测<script type="math/tex">i_{s,m+1}</script>。</p>
+<p>定义1: 超图</p>
+<p>$G=(V,E)$代表超图，$V$是包含$N$个不同节点的集合，$E$是包含$M$个超边的集合。每条超边可以包含多个顶点。</p>
+<p>定义2:超图的线图</p>
+<p>给定超图$G=(V,E)$，对应的线图$L(G)$每个顶点是$G$中的超边，如果两个顶点在$G$中对应的超边至少有一个共同节点，那这两个顶点是连接的。</p>
+<p>具体可以看下图：</p>
+<p><img src="https://s2.loli.net/2022/04/25/xTL1wlJiME3noBc.png" alt="image.png"></p>
+<h4 id="超图卷积网络"><a href="#超图卷积网络" class="headerlink" title="超图卷积网络"></a>超图卷积网络</h4><p>参照spectral超图卷积，我们定义超图卷积如下</p>
+<p>$\mathbf{x}_{i}^{(l+1)}=\sum_{j=1}^{N} \sum_{\epsilon=1}^{M} H_{i \epsilon} H_{j \epsilon} W_{\epsilon \epsilon} \mathbf{x}_{j}^{(l)}$</p>
+<p>对于$W_{\epsilon \epsilon}$，我们为每个超边分配相同的权重1，上式经过row normalization得到</p>
+<p>$\mathbf{X}_{h}^{(l+1)}=\mathbf{D}^{-1} \mathbf{H W} \mathbf{W}^{-1} \mathbf{H}^{\mathrm{T}} \mathbf{X}_{h}^{(l)}$</p>
+<p>超图卷积可以看作是对超图结构进行“节点-超边-节点”特征变换的两阶段细化。乘法运算$H^{T} X_{h}^{(l)}$定义了从节点到超边的信息聚合，然后乘$\mathbf{H}$可以看作是从超边到节点聚合信息。</p>
+<p>通过$L$层超图卷积后，对每一层的embedding进行平均得到最终embedding</p>
+<p>$X_{h}=\frac{1}{L+1} \sum_{l=0}^{L} X_{h}^{(l)}$</p>
+<p>引入位置信息，session第t项的embedding为</p>
+<p>$\mathbf{x}_{t}^{*}=\tanh \left(\mathbf{W}_{1}\left[\mathbf{x}_{t} | \mathbf{p}_{m-i+1}\right]+\mathbf{b}\right)$</p>
+<p>会话embedding可以通过聚合该会话中item的表示来表示。我们遵循在SR-GNN中使用的策略来细化会话</p>
+<p>$\alpha_{t}=\mathbf{f}^{\top} \sigma\left(\mathbf{W}_{2} \mathbf{x}_{s}^{<em>}+\mathbf{W}_{3} \mathbf{x}_{t}^{</em>}+\mathbf{c}\right), \theta_{h}=\sum_{t=1}^{m} \alpha_{t} \mathbf{x}_{t}^{*}$</p>
+<p>$x_{s}^{*}=\frac{1}{m} \sum_{t=1}^{m} x_{m}$</p>
+<p>对每个候选item$i$计算分数</p>
+<p>$\hat{\mathbf{z}}_{i}=\theta_{h}^{T} \mathbf{x}_{i}$</p>
+<p>然后softmax</p>
+<p>$\hat{\mathbf{y}}=\operatorname{softmax}(\hat{\mathbf{z}})$</p>
+<p>定义目标函数</p>
+<p>$\mathcal{L}_{r}=-\sum_{i=1}^{N} \mathbf{y}_{i} \log \left(\hat{\mathbf{y}}_{i}\right)+\left(1-\mathbf{y}_{i}\right) \log \left(1-\hat{\mathbf{y}}_{i}\right)$</p>
+<h4 id="线图卷积网络"><a href="#线图卷积网络" class="headerlink" title="线图卷积网络"></a>线图卷积网络</h4><p>线图包含了跨会话信息，并描述了超边的连通性。由于线图中不涉及任何item，首先通过查找$\mathbf{X}^{(0)}$中属于每个会话的item然后平均相应embedding来初始化会话embedding$\boldsymbol{\Theta}_{l}^{(0)}$。$\mathbf{A}$是邻接矩阵，$\hat{\mathbf{A}}=\mathbf{A}+\mathbf{I}$,$\hat{\mathbf{D}}_{p, p}=\sum_{q=1}^{m} \hat{\mathbf{A}}_{p, q}$</p>
+<p>线图卷积定义为</p>
+<p>$\boldsymbol{\Theta}_{l}^{(l+1)}=\hat{\mathbf{D}}^{-1} \hat{\mathbf{A}} \boldsymbol{\Theta}^{(l)}$</p>
+<p>在每次卷积中，会话从邻居那里收集信息，通过这样做，学习到的$\boldsymbol{\Theta}$可以捕获跨会话信息。对每层获得的会话embedding进行平均，得到最终的会话embedding</p>
+<p>$\Theta_{l}=\frac{1}{L+1} \sum_{l=0}^{L} \Theta_{l}^{(l)}$</p>
+<h4 id="创建自监督信号"><a href="#创建自监督信号" class="headerlink" title="创建自监督信号"></a>创建自监督信号</h4><p>我们通过这两个通道学习了两组会话embedding，由于每个通道编码一个图，该图只描述了item-level(会话内)或session-level(会话间)结构信息，两组embedding彼此知之甚少，但可以相互补充。对于在训练中包含$n$个会话的每个mini-batch，在两组embedding之间有一个双射映射。这两组可以作为彼此的ground-truth进行自监督学习，这种mapping也被看作label augmentation。如果两组embedding都表示同一个会话的不同view，我们将这一对标记为ground-truth，否则我们将其标记为negative。</p>
+<h4 id="对比学习"><a href="#对比学习" class="headerlink" title="对比学习"></a>对比学习</h4><p>我们对比这两个视图学习到的两组会话embedding。我们采用在来自ground-truth(正)样本和来自corrupted sample(负)样本之间的具有标准二元交叉熵损失的InfoNCE损失：</p>
+<p>$\mathcal{L}_{s}=-\log \sigma\left(f_{\mathrm{D}}\left(\theta_{i}^{h}, \theta_{i}^{l}\right)\right)-\log \sigma\left(1-f_{\mathrm{D}}\left(\tilde{\theta}_{i}^{h}, \theta_{i}^{l}\right)\right)$</p>
+<p>其中$\tilde{\theta}_{i}^{h}$或者$\tilde{\theta}_{i}^{l}$是通过逐行或逐列扰动得到的负样本</p>
+<p>最后，我们将推荐任务和自监督任务统一到一个主辅助学习框架中，前者是主任务，后者是辅助任务。在形式上，联合学习目标被定义为:</p>
+<p>$\mathcal{L}=\mathcal{L}_{r}+\beta \mathcal{L}_{s}$</p>
+<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><h4 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h4><p>使用的都是常用的公开数据集：Tmall, Nowplaying和Diginetica</p>
+<p><img src="https://s2.loli.net/2022/04/25/AU9NhcdLzrn5wS7.png" alt="image.png"></p>
+<h4 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h4><p><img src="https://s2.loli.net/2022/04/25/bgedTUEBI2qOMZN.png" alt="image.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Zhenhao Li</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://lzh66.github.io/2022/04/25/DHCN/">https://lzh66.github.io/2022/04/25/DHCN/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/">推荐系统</a><a class="post-meta__tags" href="/tags/%E4%BC%9A%E8%AF%9D%E6%8E%A8%E8%8D%90/">会话推荐</a><a class="post-meta__tags" href="/tags/%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0/">对比学习</a><a class="post-meta__tags" href="/tags/Deep-Learning/">Deep Learning</a></div><div class="post_share"><div class="social-share" data-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/04/23/%E8%BD%BB%E6%9D%BE%E6%8B%BF%E4%B8%8B%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">轻松拿下动态规划</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div><div id="comment-switch"><span class="first-comment">Valine</span><span class="switch-btn"></span><span class="second-comment">Disqus</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div><div><div id="disqus_thread"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://s2.loli.net/2022/04/22/IpxyD1gF2VqmwQB.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Zhenhao Li</div><div class="author-info__description">Beijing University of Posts and Telecommunications</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/lzh66" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:lzhbupt@bupt.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">记录在学习过程中的所学所得～</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Method"><span class="toc-number">1.</span> <span class="toc-text">Method</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B6%85%E5%9B%BE%E5%8D%B7%E7%A7%AF%E7%BD%91%E7%BB%9C"><span class="toc-number">1.1.</span> <span class="toc-text">超图卷积网络</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%BF%E5%9B%BE%E5%8D%B7%E7%A7%AF%E7%BD%91%E7%BB%9C"><span class="toc-number">1.2.</span> <span class="toc-text">线图卷积网络</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E8%87%AA%E7%9B%91%E7%9D%A3%E4%BF%A1%E5%8F%B7"><span class="toc-number">1.3.</span> <span class="toc-text">创建自监督信号</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0"><span class="toc-number">1.4.</span> <span class="toc-text">对比学习</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Experiments"><span class="toc-number">2.</span> <span class="toc-text">Experiments</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="toc-number">2.1.</span> <span class="toc-text">数据集</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">2.2.</span> <span class="toc-text">实验结果</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/04/25/DHCN/" title="DHCN-Self-Supervised Hypergraph Convolutional Networks for Session-based Recommendation(AAAI2021)">DHCN-Self-Supervised Hypergraph Convolutional Networks for Session-based Recommendation(AAAI2021)</a><time datetime="2022-04-25T07:05:43.000Z" title="Created 2022-04-25 15:05:43">2022-04-25</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/04/23/%E8%BD%BB%E6%9D%BE%E6%8B%BF%E4%B8%8B%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" title="轻松拿下动态规划">轻松拿下动态规划</a><time datetime="2022-04-23T08:59:25.000Z" title="Created 2022-04-23 16:59:25">2022-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/04/22/FastDFS%E2%80%94%E2%80%94%E4%B8%80%E6%AC%BE%E5%A5%BD%E7%94%A8%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" title="FastDFS——一款好用的分布式文件系统">FastDFS——一款好用的分布式文件系统</a><time datetime="2022-04-22T12:57:28.000Z" title="Created 2022-04-22 20:57:28">2022-04-22</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By Zhenhao Li</div><div class="footer_custom_text"><p><a style="margin-inline:5px"target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为 Hexo" alt="HEXO"></a><a style="margin-inline:5px"target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用 Butterfly" alt="Butterfly"></a><a style="margin-inline:5px"target="_blank" href="https://www.jsdelivr.com/"><img src="https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&logo=jsDelivr" title="本站使用 Jsdelivr 为静态资源提供CDN加速" alt="Jsdelivr"></a><a style="margin-inline:5px"target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由 GitHub 托管" alt="GitHub"></a><a style="margin-inline:5px"target="_blank"href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" alt="img" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Switch Between Traditional Chinese And Simplified Chinese">繁</button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.2
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container:not\([display]\)').forEach(node => {
+            const target = node.parentNode
+            if (target.nodeName.toLowerCase() === 'li') {
+              target.parentNode.classList.add('has-jax')
+            } else {
+              target.classList.add('has-jax')
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: '',
+      appKey: '',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script>function loadDisqus () {
+  var disqus_config = function () {
+    this.page.url = 'https://lzh66.github.io/2022/04/25/DHCN/'
+    this.page.identifier = '2022/04/25/DHCN/'
+    this.page.title = 'DHCN-Self-Supervised Hypergraph Convolutional Networks for Session-based Recommendation(AAAI2021)'
+  };
+
+  window.disqusReset = () => {
+    DISQUS.reset({
+      reload: true,
+      config: disqus_config
+    })
+  }
+
+  if (window.DISQUS) disqusReset()
+  else {
+    (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  }
+}
+
+if ('Valine' === 'Disqus' || !true) {
+  if (true) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+  else loadDisqus()
+} else {
+  function loadOtherComment () {
+    loadDisqus()
+  }
+}
+</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
