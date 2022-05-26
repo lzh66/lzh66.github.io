@@ -1,0 +1,464 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>ZooKeeper | Zhenhao's Blog</title><meta name="keywords" content="分布式,RPC,ZooKeeper"><meta name="author" content="Zhenhao Li"><meta name="copyright" content="Zhenhao Li"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Zookeeper分布式管理软件，常用它做注册中心（依赖Zookeeper的发布&#x2F;订阅功能）、配置文件中心、分布式锁配置、集群管理等。主要用Java语言写的。 ZooKeeper是一个开源的分布式协调服务，它的设计目标是将那些复杂且容易出错的分布式一致性服务封装起来，构成一个高效可靠的原语集，并以一系列简单易用的接口提供给客户使用。 ZooKeeper 为我们提供了高可用、高性能、稳定的分布式数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZooKeeper">
+<meta property="og:url" content="https://lzh66.github.io/2022/05/26/ZooKeeper/index.html">
+<meta property="og:site_name" content="Zhenhao&#39;s Blog">
+<meta property="og:description" content="Zookeeper分布式管理软件，常用它做注册中心（依赖Zookeeper的发布&#x2F;订阅功能）、配置文件中心、分布式锁配置、集群管理等。主要用Java语言写的。 ZooKeeper是一个开源的分布式协调服务，它的设计目标是将那些复杂且容易出错的分布式一致性服务封装起来，构成一个高效可靠的原语集，并以一系列简单易用的接口提供给客户使用。 ZooKeeper 为我们提供了高可用、高性能、稳定的分布式数据">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+<meta property="article:published_time" content="2022-05-26T03:16:37.000Z">
+<meta property="article:modified_time" content="2022-05-26T03:27:21.021Z">
+<meta property="article:author" content="Zhenhao Li">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="RPC">
+<meta property="article:tag" content="ZooKeeper">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lzh66.github.io/2022/05/26/ZooKeeper/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'ZooKeeper',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-05-26 11:27:21'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lzh66/coding@master/custom.css"><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.1.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://s2.loli.net/2022/04/22/IpxyD1gF2VqmwQB.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">10</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">16</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://w.wallhaven.cc/full/dp/wallhaven-dpzww3.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Zhenhao's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">ZooKeeper</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-05-26T03:16:37.000Z" title="Created 2022-05-26 11:16:37">2022-05-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2022-05-26T03:27:21.021Z" title="Updated 2022-05-26 11:27:21">2022-05-26</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="ZooKeeper"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>Zookeeper分布式管理软件，常用它做注册中心（依赖Zookeeper的发布/订阅功能）、配置文件中心、分布式锁配置、集群管理等。主要用Java语言写的。</p>
+<p>ZooKeeper是一个开源的分布式协调服务，它的设计目标是将那些复杂且容易出错的分布式一致性服务封装起来，构成一个高效可靠的原语集，并以一系列简单易用的接口提供给客户使用。</p>
+<p><strong>ZooKeeper 为我们提供了高可用、高性能、稳定的分布式数据一致性解决方案，通常被用于实现诸如数据发布/订阅、负载均衡、命名服务、分布式协调/通知、集群管理、Master 选举、分布式锁和分布式队列等功能。</strong></p>
+<p>另外，<strong>ZooKeeper 将数据保存在内存中，性能是非常棒的。 在“读”多于“写”的应用程序中尤其地高性能，因为“写”会导致所有的服务器间同步状态。（“读”多于“写”是协调服务的典型场景）。</strong></p>
+<h1 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h1><ul>
+<li><strong>顺序一致性：</strong> 从同一客户端发起的事务请求，最终将会严格地按照顺序被应用到 ZooKeeper 中去。</li>
+<li><strong>原子性：</strong> 所有事务请求的处理结果在整个集群中所有机器上的应用情况是一致的，也就是说，要么整个集群中所有的机器都成功应用了某一个事务，要么都没有应用。</li>
+<li><strong>单一系统映像 ：</strong> 无论客户端连到哪一个 ZooKeeper 服务器上，其看到的服务端数据模型都是一致的。</li>
+<li><strong>可靠性：</strong> 一旦一次更改请求被应用，更改的结果就会被持久化，直到被下一次更改覆盖。</li>
+</ul>
+<h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><p>我们介绍到使用其通常被用于实现诸如数据发布/订阅、负载均衡、命名服务、分布式协调/通知、集群管理、Master 选举、分布式锁和分布式队列等功能。</p>
+<p>下面选 3 个典型的应用场景来专门说说：</p>
+<ol>
+<li><strong>分布式锁</strong> ： 通过创建唯一节点获得分布式锁，当获得锁的一方执行完相关代码或者是挂掉之后就释放锁。</li>
+<li><strong>命名服务</strong> ：可以通过 ZooKeeper 的顺序节点生成全局唯一 ID</li>
+<li><strong>数据发布/订阅</strong> ：通过 <strong>Watcher 机制</strong> 可以很方便地实现数据发布/订阅。当你将数据发布到 ZooKeeper 被监听的节点上，其他机器可通过监听 ZooKeeper 上节点的变化来实现配置的动态更新。</li>
+</ol>
+<p>实际上，这些功能的实现基本都得益于 ZooKeeper 可以保存数据的功能，但是 ZooKeeper 不适合保存大量数据，这一点需要注意。</p>
+<p>以下著名的开源项目用到了ZooKeeper：</p>
+<ol>
+<li><strong>Kafka</strong> : ZooKeeper 主要为 Kafka 提供 Broker 和 Topic 的注册以及多个 Partition 的负载均衡等功能。</li>
+<li><strong>Hbase</strong> : ZooKeeper 为 Hbase 提供确保整个集群只有一个 Master 以及保存和提供 regionserver 状态信息（是否在线）等功能。</li>
+<li><strong>Hadoop</strong> : ZooKeeper 为 Namenode 提供高可用支持。</li>
+</ol>
+<h1 id="重要概念"><a href="#重要概念" class="headerlink" title="重要概念"></a>重要概念</h1><h2 id="Data-model-数据模型"><a href="#Data-model-数据模型" class="headerlink" title="Data model(数据模型)"></a>Data model(数据模型)</h2><p>ZooKeeper 数据模型采用层次化的多叉树形结构，每个节点上都可以存储数据，这些数据可以是数字、字符串或者是二级制序列。并且。每个节点还可以拥有 N 个子节点，最上层是根节点以“/”来代表。每个数据节点在 ZooKeeper 中被称为 <strong>znode</strong>，它是 ZooKeeper 中数据的最小单元。并且，每个 znode 都一个唯一的路径标识。</p>
+<p>强调一句：<strong>ZooKeeper 主要是用来协调服务的，而不是用来存储业务数据的，所以不要放比较大的数据在 znode 上，ZooKeeper 给出的上限是每个结点的数据大小最大是 1M。</strong></p>
+<p>从下图可以更直观地看出：ZooKeeper 节点路径标识方式和 Unix 文件系统路径非常相似，都是由一系列使用斜杠”/“进行分割的路径表示，开发人员可以向这个节点中写入数据，也可以在节点下面创建子节点。这些操作我们后面都会介绍到。</p>
+<p><img src="https://s2.loli.net/2022/05/22/gxEqnuGpr1mHSiI.png" alt="image.png"></p>
+<h2 id="znode-数据节点"><a href="#znode-数据节点" class="headerlink" title="znode(数据节点)"></a>znode(数据节点)</h2><p>我们知道每个数据节点在 ZooKeeper 中被称为 <strong>znode</strong>，它是 ZooKeeper 中数据的最小单元。你要存放的数据就放在上面，是你使用 ZooKeeper 过程中经常需要接触到的一个概念。每个znode都有自己所属的节点类型和节点状态。</p>
+<h3 id="znode4种类型"><a href="#znode4种类型" class="headerlink" title="znode4种类型"></a>znode4种类型</h3><p>我们通常将znode分为4大类：</p>
+<ul>
+<li><strong>持久（PERSISTENT）节点</strong> ：一旦创建就一直存在即使 ZooKeeper 集群宕机，直到将其删除。</li>
+<li><strong>临时（EPHEMERAL）节点</strong> ：临时节点的生命周期是与 <strong>客户端会话（session）</strong> 绑定的，<strong>会话消失则节点消失</strong> 。并且，<strong>临时节点只能做叶子节点</strong> ，不能创建子节点。</li>
+<li><strong>持久顺序（PERSISTENT_SEQUENTIAL）节点</strong> ：除了具有持久（PERSISTENT）节点的特性之外， 子节点的名称还具有顺序性。比如 <code>/node1/app0000000001</code> 、<code>/node1/app0000000002</code> 。</li>
+<li><strong>临时顺序（EPHEMERAL_SEQUENTIAL）节点</strong> ：除了具备临时（EPHEMERAL）节点的特性之外，子节点的名称还具有顺序性。</li>
+</ul>
+<h3 id="znode数据结构"><a href="#znode数据结构" class="headerlink" title="znode数据结构"></a>znode数据结构</h3><p>每个znode由2部分组成：</p>
+<p>stat: 状态信息</p>
+<p>data: 节点存放的数据的具体内容</p>
+<p>Stat 类中包含了一个数据节点的所有状态信息的字段，包括事务 ID-cZxid、节点创建时间-ctime 和子节点个数-numChildren 等等。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>znode 状态信息</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cZxid</td>
+<td>create ZXID，即该数据节点被创建时的事务 id</td>
+</tr>
+<tr>
+<td>ctime</td>
+<td>create time，即该节点的创建时间</td>
+</tr>
+<tr>
+<td>mZxid</td>
+<td>modified ZXID，即该节点最终一次更新时的事务 id</td>
+</tr>
+<tr>
+<td>mtime</td>
+<td>modified time，即该节点最后一次的更新时间</td>
+</tr>
+<tr>
+<td>pZxid</td>
+<td>该节点的子节点列表最后一次修改时的事务 id，只有子节点列表变更才会更新 pZxid，子节点内容变更不会更新</td>
+</tr>
+<tr>
+<td>cversion</td>
+<td>子节点版本号，当前节点的子节点每次变化时值增加 1</td>
+</tr>
+<tr>
+<td>dataVersion</td>
+<td>数据节点内容版本号，节点创建时为 0，每更新一次节点内容(不管内容有无变化)该版本号的值增加 1</td>
+</tr>
+<tr>
+<td>aclVersion</td>
+<td>节点的 ACL 版本号，表示该节点 ACL 信息变更次数</td>
+</tr>
+<tr>
+<td>ephemeralOwner</td>
+<td>创建该临时节点的会话的 sessionId；如果当前节点为持久节点，则 ephemeralOwner=0</td>
+</tr>
+<tr>
+<td>dataLength</td>
+<td>数据节点内容长度</td>
+</tr>
+<tr>
+<td>numChildren</td>
+<td>当前节点的子节点个数</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="版本-version"><a href="#版本-version" class="headerlink" title="版本(version)"></a>版本(version)</h2><p>在前面我们已经提到，对应于每个 znode，ZooKeeper 都会为其维护一个叫作 <strong>Stat</strong> 的数据结构，Stat 中记录了这个 znode 的三个相关的版本：</p>
+<ul>
+<li><strong>dataVersion</strong> ：当前 znode 节点的版本号</li>
+<li><strong>cversion</strong> ： 当前 znode 子节点的版本</li>
+<li><strong>aclVersion</strong> ： 当前 znode 的 ACL 的版本。</li>
+</ul>
+<h2 id="ACL-权限控制"><a href="#ACL-权限控制" class="headerlink" title="ACL(权限控制)"></a>ACL(权限控制)</h2><p>ZooKeeper 采用 ACL（AccessControlLists）策略来进行权限控制，类似于 UNIX 文件系统的权限控制。</p>
+<p>对于 znode 操作的权限，ZooKeeper 提供了以下 5 种：</p>
+<ul>
+<li><strong>CREATE</strong> : 能创建子节点</li>
+<li><strong>READ</strong> ：能获取节点数据和列出其子节点</li>
+<li><strong>WRITE</strong> : 能设置/更新节点数据</li>
+<li><strong>DELETE</strong> : 能删除子节点</li>
+<li><strong>ADMIN</strong> : 能设置节点 ACL 的权限</li>
+</ul>
+<p>其中尤其需要注意的是，<strong>CREATE</strong> 和 <strong>DELETE</strong> 这两种权限都是针对 <strong>子节点</strong> 的权限控制。</p>
+<p>对于身份认证，提供了以下几种方式：</p>
+<ul>
+<li><strong>world</strong> ： 默认方式，所有用户都可无条件访问。</li>
+<li><strong>auth</strong> :不使用任何 id，代表任何已认证的用户。</li>
+<li><strong>digest</strong> :用户名:密码认证方式： <em>username:password</em> 。</li>
+<li><strong>ip</strong> : 对指定 ip 进行限制。</li>
+</ul>
+<h2 id="Watcher-事件监听器"><a href="#Watcher-事件监听器" class="headerlink" title="Watcher(事件监听器)"></a>Watcher(事件监听器)</h2><p>Watcher（事件监听器），是 ZooKeeper 中的一个很重要的特性。ZooKeeper 允许用户在指定节点上注册一些 Watcher，并且在一些特定事件触发的时候，ZooKeeper 服务端会将事件通知到感兴趣的客户端上去，该机制是 ZooKeeper 实现分布式协调服务的重要特性。</p>
+<p><img src="https://s2.loli.net/2022/05/22/uj6lr2cLFPpG7vH.png" alt="image.png"></p>
+<h2 id="会话-Session"><a href="#会话-Session" class="headerlink" title="会话(Session)"></a>会话(Session)</h2><p>Session 可以看作是 ZooKeeper 服务器与客户端的之间的一个 TCP 长连接，通过这个连接，客户端能够通过心跳检测与服务器保持有效的会话，也能够向 ZooKeeper 服务器发送请求并接受响应，同时还能够通过该连接接收来自服务器的 Watcher 事件通知。</p>
+<p>Session 有一个属性叫做：<code>sessionTimeout</code> ，<code>sessionTimeout</code> 代表会话的超时时间。当由于服务器压力太大、网络故障或是客户端主动断开连接等各种原因导致客户端连接断开时，只要在<code>sessionTimeout</code>规定的时间内能够重新连接上集群中任意一台服务器，那么之前创建的会话仍然有效。</p>
+<p>另外，在为客户端创建会话之前，服务端首先会为每个客户端都分配一个 <code>sessionID</code>。由于 <code>sessionID</code>是 ZooKeeper 会话的一个重要标识，许多与会话相关的运行机制都是基于这个 <code>sessionID</code> 的，因此，无论是哪台服务器为客户端分配的 <code>sessionID</code>，都务必保证全局唯一。</p>
+<p>在 <code>zookeeper</code> 中，会话还有对应的事件，比如 <code>CONNECTION_LOSS 连接丢失事件</code> 、<code>SESSION_MOVED 会话转移事件</code> 、<code>SESSION_EXPIRED 会话超时失效事件</code> 。</p>
+<h1 id="ZooKeeper集群"><a href="#ZooKeeper集群" class="headerlink" title="ZooKeeper集群"></a>ZooKeeper集群</h1><p>为了保证高可用，最好是以集群形态来部署 ZooKeeper，这样只要集群中大部分机器是可用的（能够容忍一定的机器故障），那么 ZooKeeper 本身仍然是可用的。通常 3 台服务器就可以构成一个 ZooKeeper 集群了。ZooKeeper 官方提供的架构图就是一个 ZooKeeper 集群整体对外提供服务。</p>
+<p><img src="https://s2.loli.net/2022/05/22/G4TYQesIg6vbqcX.png" alt="image.png"></p>
+<p>上图中每一个 Server 代表一个安装 ZooKeeper 服务的服务器。组成 ZooKeeper 服务的服务器都会在内存中维护当前的服务器状态，并且每台服务器之间都互相保持着通信。集群间通过 ZAB 协议（ZooKeeper Atomic Broadcast）来保持数据的一致性。</p>
+<p><strong>最典型集群模式： Master/Slave 模式（主备模式）</strong>。在这种模式中，通常 Master 服务器作为主服务器提供写服务，其他的 Slave 服务器从服务器通过异步复制的方式获取 Master 服务器最新的数据提供读服务。</p>
+<h2 id="ZooKeeper集群角色"><a href="#ZooKeeper集群角色" class="headerlink" title="ZooKeeper集群角色"></a>ZooKeeper集群角色</h2><p>但是，在ZooKeeper中没有选择传统的Master/Slave概念，而是引入了Leader、Follower和Observer三种角色。如下图所示</p>
+<p><img src="https://s2.loli.net/2022/05/22/adVs9ztFBxEl6fj.png" alt="image.png"></p>
+<p>ZooKeeper 集群中的所有机器通过一个 <strong>Leader 选举过程</strong> 来选定一台称为 “<strong>Leader</strong>” 的机器，Leader 既可以为客户端提供写服务又能提供读服务。除了 Leader 外，<strong>Follower</strong> 和 <strong>Observer</strong> 都只能提供读服务。Follower 和 Observer 唯一的区别在于 Observer 机器不参与 Leader 的选举过程，也不参与写操作的“过半写成功”策略，因此 Observer 机器可以在不影响写性能的情况下提升集群的读性能。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Leader</td>
+<td>为客户端提供读和写的服务，负责投票的发起和决议，更新系统状态。</td>
+</tr>
+<tr>
+<td>Follower</td>
+<td>为客户端提供读服务，如果是写服务则转发给 Leader。参与选举过程中的投票。</td>
+</tr>
+<tr>
+<td>Observer</td>
+<td>为客户端提供读服务，如果是写服务则转发给 Leader。不参与选举过程中的投票，也不参与“过半写成功”策略。在不影响写性能的情况下提升集群的读性能。此角色于 ZooKeeper3.3 系列新增的角色。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>当 Leader 服务器出现网络中断、崩溃退出与重启等异常情况时，就会进入 Leader 选举过程，这个过程会选举产生新的 Leader 服务器。</p>
+<p>这个过程大致是这样的：</p>
+<ol>
+<li><strong>Leader election（选举阶段）</strong>：节点在一开始都处于选举阶段，只要有一个节点得到超半数节点的票数，它就可以当选准 leader。</li>
+<li><strong>Discovery（发现阶段）</strong> ：在这个阶段，followers 跟准 leader 进行通信，同步 followers 最近接收的事务提议。</li>
+<li><strong>Synchronization（同步阶段）</strong> :同步阶段主要是利用 leader 前一阶段获得的最新提议历史，同步集群中所有的副本。同步完成之后 准 leader 才会成为真正的 leader。</li>
+<li><strong>Broadcast（广播阶段）</strong> :到了这个阶段，ZooKeeper 集群才能正式对外提供事务服务，并且 leader 可以进行消息广播。同时如果有新的节点加入，还需要对新节点进行同步。</li>
+</ol>
+<h2 id="ZooKeeper集群中的服务器状态"><a href="#ZooKeeper集群中的服务器状态" class="headerlink" title="ZooKeeper集群中的服务器状态"></a>ZooKeeper集群中的服务器状态</h2><ul>
+<li><strong>LOOKING</strong> ：寻找 Leader。</li>
+<li><strong>LEADING</strong> ：Leader 状态，对应的节点为 Leader。</li>
+<li><strong>FOLLOWING</strong> ：Follower 状态，对应的节点为 Follower。</li>
+<li><strong>OBSERVING</strong> ：Observer 状态，对应节点为 Observer，该节点不参与 Leader 选举。</li>
+</ul>
+<h2 id="ZooKeeper集群为什么最好是奇数台？"><a href="#ZooKeeper集群为什么最好是奇数台？" class="headerlink" title="ZooKeeper集群为什么最好是奇数台？"></a>ZooKeeper集群为什么最好是奇数台？</h2><p>ZooKeeper 集群在宕掉几个 ZooKeeper 服务器之后，如果剩下的 ZooKeeper 服务器个数大于宕掉的个数的话整个 ZooKeeper 才依然可用。假如我们的集群中有 n 台 ZooKeeper 服务器，那么也就是剩下的服务数必须大于 n/2。先说一下结论，2n 和 2n-1 的容忍度是一样的，都是 n-1，大家可以先自己仔细想一想，这应该是一个很简单的数学问题了。</p>
+<p>比如假如我们有 3 台，那么最大允许宕掉 1 台 ZooKeeper 服务器，如果我们有 4 台的的时候也同样只允许宕掉 1 台。 假如我们有 5 台，那么最大允许宕掉 2 台 ZooKeeper 服务器，如果我们有 6 台的的时候也同样只允许宕掉 2 台。</p>
+<p>综上，何必增加那一个不必要的 ZooKeeper 呢?</p>
+<h2 id="ZooKeeper选举的过半机制防止脑裂"><a href="#ZooKeeper选举的过半机制防止脑裂" class="headerlink" title="ZooKeeper选举的过半机制防止脑裂"></a>ZooKeeper选举的过半机制防止脑裂</h2><p><strong>何为集群脑裂？</strong></p>
+<p>对于一个集群，通常多台机器会部署在不同机房，来提高这个集群的可用性。保证可用性的同时，会发生一种机房间网络线路故障，导致机房间网络不通，而集群被割裂成几个小集群。这时候子集群各自选主导致“脑裂”的情况。</p>
+<p>举例说明：比如现在有一个由 6 台服务器所组成的一个集群，部署在了 2 个机房，每个机房 3 台。正常情况下只有 1 个 leader，但是当两个机房中间网络断开的时候，每个机房的 3 台服务器都会认为另一个机房的 3 台服务器下线，而选出自己的 leader 并对外提供服务。若没有过半机制，当网络恢复的时候会发现有 2 个 leader。仿佛是 1 个大脑（leader）分散成了 2 个大脑，这就发生了脑裂现象。脑裂期间 2 个大脑都可能对外提供了服务，这将会带来数据一致性等问题。</p>
+<p><strong>过半机制是如何防止脑裂现象产生的？</strong></p>
+<p>ZooKeeper 的过半机制导致不可能产生 2 个 leader，因为少于等于一半是不可能产生 leader 的，这就使得不论机房的机器如何分配都不可能发生脑裂。</p>
+<h1 id="ZooKeeper一致性问题"><a href="#ZooKeeper一致性问题" class="headerlink" title="ZooKeeper一致性问题"></a>ZooKeeper一致性问题</h1><p>设计一个分布式系统必定会遇到一个问题——因为分区容错性的存在，就必定要求我们需要在系统可用性和数据一致性中做出权衡。这就是著名的CAP定理。</p>
+<h2 id="一致性协议和算法"><a href="#一致性协议和算法" class="headerlink" title="一致性协议和算法"></a>一致性协议和算法</h2><p>为了解决数据一致性问题，在科学家和程序员的不断探索中，就出现了很多的一致性协议和算法。比如2PC(两阶段提交)，3PC(三阶段提交)，Paxos算法等。</p>
+<h2 id="2PC-两阶段提交"><a href="#2PC-两阶段提交" class="headerlink" title="2PC(两阶段提交)"></a>2PC(两阶段提交)</h2><p>两阶段提交是一种保证分布式系统数据一致性的协议，现在很多数据库都是采用的两阶段提交协议来完成分布式事务的处理。在两阶段提交中，主要涉及到两个角色，分别是协调者和参与者。</p>
+<p>第一阶段：当要执行一个分布式事务的时候，事务发起者首先向协调者发起事务请求，然后协调者会给所有参与者发送 <code>prepare</code> 请求告诉参与者需要执行事务了，如果能执行事务内容就先执行，但是不提交，执行后给协调者发送消息。然后参与者收到<code>prepare</code>消息后，它们会开始执行事务，并将<code>Undo</code>和<code>Redo</code>信息记入事务日志中，之后参与者就向协调者反馈是否准备好了。</p>
+<p>第二阶段：第二阶段主要是协调者根据参与者反馈的情况来决定接下来是否可以进行事务的提交操作，即提交事务或者回滚事务。</p>
+<p>比如这个时候 <strong>所有的参与者</strong> 都返回了准备好了的消息，这个时候就进行事务的提交，协调者此时会给所有的参与者发送 <strong><code>Commit</code> 请求</strong> ，当参与者收到 <code>Commit</code> 请求的时候会执行前面执行的事务的 <strong>提交操作</strong> ，提交完毕之后将给协调者发送提交成功的响应。</p>
+<p>而如果在第一阶段并不是所有参与者都返回了准备好了的消息，那么此时协调者将会给所有参与者发送 <strong>回滚事务的 <code>rollback</code> 请求</strong>，参与者收到之后将会 <strong>回滚它在第一阶段所做的事务处理</strong> ，然后再将处理情况返回给协调者，最终协调者收到响应后便给事务发起者返回处理失败的结果。</p>
+<p>2PC解决了各个事务的原子性问题，但是也带来了很多问题：</p>
+<ul>
+<li>单点故障问题，如果协调者挂了那么整个系统都处于不可用的状态了</li>
+<li>阻塞问题，即当协调者发送<code>prepare</code>请求，参与者收到之后如果能处理那么它将会进行事务的处理但并不提交，这个时候会占用着资源不释放，如果此时协调者挂了，那么这些资源都不会再释放了，这回极大影响性能。</li>
+<li>数据不一致问题，比如当第二阶段，协调者只发送了一部分的<code>commit</code>请求就挂了，那么也就意味着，收到消息的参与者会进行事务的提交，而后面没收到的则不会进行事务提交，那么这时候就会产生数据不一致性问题。</li>
+</ul>
+<h2 id="3PC-三阶段提交"><a href="#3PC-三阶段提交" class="headerlink" title="3PC(三阶段提交)"></a>3PC(三阶段提交)</h2><p>3PC包括以下阶段：</p>
+<ol>
+<li>CanCommit阶段：协调者向所有参与者发送<code>CanCommit</code>请求，参与者收到请求后会根据自身情况查看是否能执行事务，如果可以则返回YES响应并进入预备状态，否则返回NO。</li>
+<li>PreCommit阶段：协调者根据参与者返回的响应来决定是否可以进行下面的 <code>PreCommit</code> 操作。如果上面参与者返回的都是 YES，那么协调者将向所有参与者发送 <code>PreCommit</code> 预提交请求，<strong>参与者收到预提交请求后，会进行事务的执行操作，并将 <code>Undo</code> 和 <code>Redo</code> 信息写入事务日志中</strong> ，最后如果参与者顺利执行了事务则给协调者返回成功的响应。如果在第一阶段协调者收到了 <strong>任何一个 NO</strong>的信息，或者 <strong>在一定时间内</strong> 并没有收到全部的参与者的响应，那么就会中断事务，它会向所有参与者发送中断请求（abort），参与者收到中断请求之后会立即中断事务，或者在一定时间内没有收到协调者的请求，它也会中断事务。</li>
+<li>DoCommit阶段：这个阶段其实和 <code>2PC</code> 的第二阶段差不多，如果协调者收到了所有参与者在 <code>PreCommit</code> 阶段的 YES 响应，那么协调者将会给所有参与者发送 <code>DoCommit</code> 请求，<strong>参与者收到 <code>DoCommit</code> 请求后则会进行事务的提交工作</strong>，完成后则会给协调者返回响应，协调者收到所有参与者返回的事务提交成功的响应之后则完成事务。若协调者在 <code>PreCommit</code> 阶段 <strong>收到了任何一个 NO 或者在一定时间内没有收到所有参与者的响应</strong> ，那么就会进行中断请求的发送，参与者收到中断请求后则会 <strong>通过上面记录的回滚日志</strong> 来进行事务的回滚操作，并向协调者反馈回滚状况，协调者收到参与者返回的消息后，中断事务。</li>
+</ol>
+<p><img src="https://s2.loli.net/2022/05/24/g6rZIQi9uElWyRU.png" alt="image.png"></p>
+<p>总之，<code>3PC</code> 通过一系列的超时机制很好的缓解了阻塞问题，但是最重要的一致性并没有得到根本的解决，比如在 <code>PreCommit</code> 阶段，当一个参与者收到了请求之后其他参与者和协调者挂了或者出现了网络分区，这个时候收到消息的参与者都会进行事务提交，这就会出现数据不一致性问题。</p>
+<p>所以，要解决一致性问题还需要靠 <code>Paxos</code> 算法。</p>
+<h2 id="Paxos算法"><a href="#Paxos算法" class="headerlink" title="Paxos算法"></a>Paxos算法</h2><p><code>Paxos</code> 算法是基于<strong>消息传递且具有高度容错特性的一致性算法</strong>，是目前公认的解决分布式一致性问题最有效的算法之一，<strong>其解决的问题就是在分布式系统中如何就某个值（决议）达成一致</strong> 。</p>
+<p>在 <code>Paxos</code> 中主要有三个角色，分别为 <code>Proposer提案者</code>、<code>Acceptor表决者</code>、<code>Learner学习者</code>。<code>Paxos</code> 算法和 <code>2PC</code> 一样，也有两个阶段，分别为 <code>Prepare</code> 和 <code>accept</code> 阶段。</p>
+<h3 id="prepare-阶段"><a href="#prepare-阶段" class="headerlink" title="prepare 阶段"></a>prepare 阶段</h3><ul>
+<li><code>Proposer提案者</code>：负责提出 <code>proposal</code>，每个提案者在提出提案时都会首先获取到一个 <strong>具有全局唯一性的、递增的提案编号N</strong>，即在整个集群中是唯一的编号 N，然后将该编号赋予其要提出的提案，在<strong>第一阶段是只将提案编号发送给所有的表决者</strong>。</li>
+<li><code>Acceptor表决者</code>：每个表决者在 <code>accept</code> 某提案后，会将该提案编号N记录在本地，这样每个表决者中保存的已经被 accept 的提案中会存在一个<strong>编号最大的提案</strong>，其编号假设为 <code>maxN</code>。每个表决者仅会 <code>accept</code> 编号大于自己本地 <code>maxN</code> 的提案，在批准提案时表决者会将以前接受过的最大编号的提案作为响应反馈给 <code>Proposer</code> 。</li>
+</ul>
+<p>下面是prepare阶段的流程图</p>
+<p><img src="https://s2.loli.net/2022/05/26/OZjMqrRdyAuGov7.png" alt="image.png"></p>
+<h3 id="accept阶段"><a href="#accept阶段" class="headerlink" title="accept阶段"></a>accept阶段</h3><p>当一个提案被 <code>Proposer</code> 提出后，如果 <code>Proposer</code> 收到了超过半数的 <code>Acceptor</code> 的批准（<code>Proposer</code> 本身同意），那么此时 <code>Proposer</code> 会给所有的 <code>Acceptor</code> 发送真正的提案（你可以理解为第一阶段为试探），这个时候 <code>Proposer</code> 就会发送提案的内容和提案编号。</p>
+<p>表决者收到提案请求后会再次比较本身已经批准过的最大提案编号和该提案编号，如果该提案编号 <strong>大于等于</strong> 已经批准过的最大提案编号，那么就 <code>accept</code> 该提案（此时执行提案内容但不提交），随后将情况返回给 <code>Proposer</code> 。如果不满足则不回应或者返回 NO 。</p>
+<p><img src="https://s2.loli.net/2022/05/26/SsHOi3IqT5okJdL.png" alt="image.png"></p>
+<p>当 <code>Proposer</code> 收到超过半数的 <code>accept</code> ，那么它这个时候会向所有的 <code>acceptor</code> 发送提案的提交请求。需要注意的是，因为上述仅仅是超过半数的 <code>acceptor</code> 批准执行了该提案内容，其他没有批准的并没有执行该提案内容，所以这个时候需要<strong>向未批准的 <code>acceptor</code> 发送提案内容和提案编号并让它无条件执行和提交</strong>，而对于前面已经批准过该提案的 <code>acceptor</code> 来说 <strong>仅仅需要发送该提案的编号</strong> ，让 <code>acceptor</code> 执行提交就行了。</p>
+<p><img src="https://s2.loli.net/2022/05/26/Q6yPVwgH7BtrdsA.png" alt="image.png"></p>
+<p>而如果 <code>Proposer</code> 如果没有收到超过半数的 <code>accept</code> 那么它将会将 <strong>递增</strong> 该 <code>Proposal</code> 的编号，然后 <strong>重新进入 <code>Prepare</code> 阶段</strong> 。</p>
+<h3 id="paxos算法的死循环问题"><a href="#paxos算法的死循环问题" class="headerlink" title="paxos算法的死循环问题"></a>paxos算法的死循环问题</h3><p>死循环问题是，比如说，此时提案者 P1 提出一个方案 M1，完成了 <code>Prepare</code> 阶段的工作，这个时候 <code>acceptor</code> 则批准了 M1，但是此时提案者 P2 同时也提出了一个方案 M2，它也完成了 <code>Prepare</code> 阶段的工作。然后 P1 的方案已经不能在第二阶段被批准了（因为 <code>acceptor</code> 已经批准了比 M1 更大的 M2），所以 P1 自增方案变为 M3 重新进入 <code>Prepare</code> 阶段，然后 <code>acceptor</code> ，又批准了新的 M3 方案，它又不能批准 M2 了，这个时候 M2 又自增进入 <code>Prepare</code> 阶段。。。</p>
+<p>就这样无休无止的永远提案下去，这就是paxos算法的死循环问题。</p>
+<p>那么如何解决呢？只允许一个能提案就行了。</p>
+<h2 id="ZAB"><a href="#ZAB" class="headerlink" title="ZAB"></a>ZAB</h2><h3 id="ZooKeeper架构"><a href="#ZooKeeper架构" class="headerlink" title="ZooKeeper架构"></a>ZooKeeper架构</h3><p>作为一个优秀高效且可靠的分布式协调框架，<code>ZooKeeper</code> 在解决分布式数据一致性问题时并没有直接使用 <code>Paxos</code> ，而是专门定制了一致性协议叫做 <code>ZAB(ZooKeeper Atomic Broadcast)</code> 原子广播协议，该协议能够很好地支持 <strong>崩溃恢复</strong> 。</p>
+<h3 id="ZAB中的三个角色"><a href="#ZAB中的三个角色" class="headerlink" title="ZAB中的三个角色"></a>ZAB中的三个角色</h3><p>和介绍 <code>Paxos</code> 一样，在介绍 <code>ZAB</code> 协议之前，我们首先来了解一下在 <code>ZAB</code> 中三个主要的角色，<code>Leader 领导者</code>、<code>Follower跟随者</code>、<code>Observer观察者</code> 。</p>
+<ul>
+<li><code>Leader</code> ：集群中 <strong>唯一的写请求处理者</strong> ，能够发起投票（投票也是为了进行写请求）。</li>
+<li><code>Follower</code>：能够接收客户端的请求，如果是读请求则可以自己处理，<strong>如果是写请求则要转发给 <code>Leader</code></strong> 。在选举过程中会参与投票，<strong>有选举权和被选举权</strong> 。</li>
+<li><code>Observer</code> ：就是没有选举权和被选举权的 <code>Follower</code> 。</li>
+</ul>
+<p>在 <code>ZAB</code> 协议中对 <code>zkServer</code>(即上面我们说的三个角色的总称) 还有两种模式的定义，分别是 <strong>消息广播</strong> 和 <strong>崩溃恢复</strong> 。</p>
+<h3 id="消息广播模式"><a href="#消息广播模式" class="headerlink" title="消息广播模式"></a>消息广播模式</h3><p>说白了就是 <code>ZAB</code> 协议是如何处理写请求的，上面我们不是说只有 <code>Leader</code> 能处理写请求嘛？那么我们的 <code>Follower</code> 和 <code>Observer</code> 是不是也需要 <strong>同步更新数据</strong> 呢？总不能数据只在 <code>Leader</code> 中更新了，其他角色都没有得到更新吧？</p>
+<p>不就是 <strong>在整个集群中保持数据的一致性</strong> 嘛？如果是你，你会怎么做呢？</p>
+<p>第一步肯定需要Leader将写请求广播出去，Leader询问Followers是否同意更新，如果超过半数以上的同意那么就进行Follower和Observer的更新（和Paxos一样）。</p>
+<p><img src="https://s2.loli.net/2022/05/26/6jHPgZi5kGwh14J.png" alt="image.png"></p>
+<p>ZAB需要让Follower和Observer保证顺序性。何为顺序性，比如我现在有一个写请求A，此时 <code>Leader</code>将请求A广播出去，因为只需要半数同意就行，所以可能这个时候有一个 <code>Follower</code> F1因为网络原因没有收到，而 <code>Leader</code> 又广播了一个请求B，因为网络原因，F1竟然先收到了请求B然后才收到了请求A，这个时候请求处理的顺序不同就会导致数据的不同，从而 <strong>产生数据不一致问题</strong> 。</p>
+<p>所以在Leader这端，它为每个其他的zkServer准备了一个队列，采用先进先出的方式发送消息。由于协议是通过TCP来进行网络通信的，保证了消息的发送顺序性，接受顺序性也得到了保证。</p>
+<p>除此之外，在 <code>ZAB</code> 中还定义了一个 <strong>全局单调递增的事务ID <code>ZXID</code></strong> ，它是一个64位long型，其中高32位表示 <code>epoch</code> 年代，低32位表示事务id。<code>epoch</code> 是会根据 <code>Leader</code> 的变化而变化的，当一个 <code>Leader</code> 挂了，新的 <code>Leader</code> 上位的时候，年代（<code>epoch</code>）就变了。而低32位可以简单理解为递增的事务id。</p>
+<p>定义这个的原因也是为了顺序性，每个 <code>proposal</code> 在 <code>Leader</code> 中生成后需要 <strong>通过其 <code>ZXID</code> 来进行排序</strong> ，才能得到处理。</p>
+<h3 id="崩溃恢复模式"><a href="#崩溃恢复模式" class="headerlink" title="崩溃恢复模式"></a>崩溃恢复模式</h3><p>说到崩溃恢复我们首先要提到 <code>ZAB</code> 中的 <code>Leader</code> 选举算法，当系统出现崩溃影响最大应该是 <code>Leader</code> 的崩溃，因为我们只有一个 <code>Leader</code> ，所以当 <code>Leader</code> 出现问题的时候我们势必需要重新选举 <code>Leader</code> 。</p>
+<p><code>Leader</code> 选举可以分为两个不同的阶段，第一个是我们提到的 <code>Leader</code> 宕机需要重新选举，第二则是当 <code>Zookeeper</code> 启动时需要进行系统的 <code>Leader</code> 初始化选举。下面我先来介绍一下 <code>ZAB</code> 是如何进行初始化选举的。</p>
+<p>假设我们集群中有3台机器，那也就意味着我们需要两台以上同意（超过半数）。比如这个时候我们启动了 <code>server1</code> ，它会首先 <strong>投票给自己</strong> ，投票内容为服务器的 <code>myid</code> 和 <code>ZXID</code> ，因为初始化所以 <code>ZXID</code> 都为0，此时 <code>server1</code> 发出的投票为 (1,0)。但此时 <code>server1</code> 的投票仅为1，所以不能作为 <code>Leader</code> ，此时还在选举阶段所以整个集群处于 <strong><code>Looking</code> 状态</strong>。</p>
+<p>接着 <code>server2</code> 启动了，它首先也会将投票选给自己(2,0)，并将投票信息广播出去（<code>server1</code>也会，只是它那时没有其他的服务器了），<code>server1</code> 在收到 <code>server2</code> 的投票信息后会将投票信息与自己的作比较。<strong>首先它会比较 <code>ZXID</code> ，<code>ZXID</code> 大的优先为 <code>Leader</code>，如果相同则比较 <code>myid</code>，<code>myid</code> 大的优先作为 <code>Leader</code></strong>。所以此时<code>server1</code> 发现 <code>server2</code> 更适合做 <code>Leader</code>，它就会将自己的投票信息更改为(2,0)然后再广播出去，之后<code>server2</code> 收到之后发现和自己的一样无需做更改，并且自己的 <strong>投票已经超过半数</strong> ，则 <strong>确定 <code>server2</code> 为 <code>Leader</code></strong>，<code>server1</code> 也会将自己服务器设置为 <code>Following</code> 变为 <code>Follower</code>。整个服务器就从 <code>Looking</code> 变为了正常状态。</p>
+<p>当 <code>server3</code> 启动发现集群没有处于 <code>Looking</code> 状态时，它会直接以 <code>Follower</code> 的身份加入集群。</p>
+<p>还是前面三个 <code>server</code> 的例子，如果在整个集群运行的过程中 <code>server2</code> 挂了，那么整个集群会如何重新选举 <code>Leader</code> 呢？其实和初始化选举差不多。</p>
+<p>首先毫无疑问的是剩下的两个 <code>Follower</code> 会将自己的状态 <strong>从 <code>Following</code> 变为 <code>Looking</code> 状态</strong> ，然后每个 <code>server</code> 会向初始化投票一样首先给自己投票（这不过这里的 <code>zxid</code> 可能不是0了，这里为了方便随便取个数字）。</p>
+<p>假设 <code>server1</code> 给自己投票为(1,99)，然后广播给其他 <code>server</code>，<code>server3</code> 首先也会给自己投票(3,95)，然后也广播给其他 <code>server</code>。<code>server1</code> 和 <code>server3</code> 此时会收到彼此的投票信息，和一开始选举一样，他们也会比较自己的投票和收到的投票（<code>zxid</code> 大的优先，如果相同那么就 <code>myid</code> 大的优先）。这个时候 <code>server1</code> 收到了 <code>server3</code> 的投票发现没自己的合适故不变，<code>server3</code> 收到 <code>server1</code> 的投票结果后发现比自己的合适于是更改投票为(1,99)然后广播出去，最后 <code>server1</code> 收到了发现自己的投票已经超过半数就把自己设为 <code>Leader</code>，<code>server3</code> 也随之变为 <code>Follower</code>。</p>
+<p>那么说完了 <code>ZAB</code> 中的 <code>Leader</code> 选举方式之后我们再来了解一下 <strong>崩溃恢复</strong> 是什么玩意？</p>
+<p>其实主要就是 <strong>当集群中有机器挂了，我们整个集群如何保证数据一致性？</strong></p>
+<p>如果只是 <code>Follower</code> 挂了，而且挂的没超过半数的时候，因为我们一开始讲了在 <code>Leader</code> 中会维护队列，所以不用担心后面的数据没接收到导致数据不一致性。</p>
+<p>如果 <code>Leader</code> 挂了那就麻烦了，我们肯定需要先暂停服务变为 <code>Looking</code> 状态然后进行 <code>Leader</code> 的重新选举（上面我讲过了），但这个就要分为两种情况了，分别是 <strong>确保已经被Leader提交的提案最终能够被所有的Follower提交</strong> 和 <strong>跳过那些已经被丢弃的提案</strong> 。</p>
+<p>确保已经被Leader提交的提案最终能够被所有的Follower提交是什么意思呢？</p>
+<p>假设 <code>Leader (server2)</code> 发送 <code>commit</code> 请求，他发送给了 <code>server3</code>，然后要发给 <code>server1</code> 的时候突然挂了。这个时候重新选举的时候我们如果把 <code>server1</code>作为 <code>Leader</code> 的话，那么肯定会产生数据不一致性，因为 <code>server3</code> 肯定会提交刚刚 <code>server2</code> 发送的 <code>commit</code> 请求的提案，而 <code>server1</code> 根本没收到所以会丢弃。</p>
+<p><img src="https://s2.loli.net/2022/05/26/lAp3ugvFbisVafk.png" alt="image.png"></p>
+<p>那怎么解决呢？</p>
+<p>聪明的同学肯定会质疑，<strong>这个时候 <code>server1</code> 已经不可能成为 <code>Leader</code> 了，因为 <code>server1</code> 和 <code>server3</code> 进行投票选举的时候会比较 <code>ZXID</code> ，而此时 <code>server3</code> 的 <code>ZXID</code> 肯定比 <code>server1</code> 的大了</strong>。(不理解可以看前面的选举算法)</p>
+<p>那么跳过那些已经被丢弃的提案又是什么意思呢？</p>
+<p>假设 <code>Leader (server2)</code> 此时同意了提案N1，自身提交了这个事务并且要发送给所有 <code>Follower</code> 要 <code>commit</code> 的请求，却在这个时候挂了，此时肯定要重新进行 <code>Leader</code> 的选举，比如说此时选 <code>server1</code> 为 <code>Leader</code> （这无所谓）。但是过了一会，这个 <strong>挂掉的 <code>Leader</code> 又重新恢复了</strong> ，此时它肯定会作为 <code>Follower</code> 的身份进入集群中，需要注意的是刚刚 <code>server2</code> 已经同意提交了提案N1，但其他 <code>server</code> 并没有收到它的 <code>commit</code> 信息，所以其他 <code>server</code> 不可能再提交这个提案N1了，这样就会出现数据不一致性问题了，所以 <strong>该提案N1最终需要被抛弃掉</strong> 。</p>
+<p><img src="https://s2.loli.net/2022/05/26/rZjwIdHFi8VJQ5a.png" alt="image.png"></p>
+<h2 id="ZooKeeper的几个典型应用场景"><a href="#ZooKeeper的几个典型应用场景" class="headerlink" title="ZooKeeper的几个典型应用场景"></a>ZooKeeper的几个典型应用场景</h2><h3 id="选主"><a href="#选主" class="headerlink" title="选主"></a>选主</h3><p>因为 <code>Zookeeper</code> 的强一致性，能够很好地在保证 <strong>在高并发的情况下保证节点创建的全局唯一性</strong> (即无法重复创建同样的节点)。</p>
+<p>利用这个特性，我们可以 <strong>让多个客户端创建一个指定的节点</strong> ，创建成功的就是 <code>master</code>。</p>
+<p>但是，如果这个 <code>master</code> 挂了怎么办？？？</p>
+<p>你想想为什么我们要创建临时节点？还记得临时节点的生命周期吗？<code>master</code> 挂了是不是代表会话断了？会话断了是不是意味着这个节点没了？还记得 <code>watcher</code> 吗？我们是不是可以 <strong>让其他不是 <code>master</code> 的节点监听节点的状态</strong> ，比如说我们监听这个临时节点的父节点，如果子节点个数变了就代表 <code>master</code> 挂了，这个时候我们 <strong>触发回调函数进行重新选举</strong> ，或者我们直接监听节点的状态，我们可以通过节点是否已经失去连接来判断 <code>master</code> 是否挂了等等。</p>
+<p><img src="https://s2.loli.net/2022/05/26/GKVbmF5nsIOLeB6.png" alt="image.png"></p>
+<p>总的来说，我们可以完全 <strong>利用 临时节点、节点状态 和 <code>watcher</code> 来实现选主的功能</strong>，临时节点主要用来选举，节点状态和<code>watcher</code> 可以用来判断 <code>master</code> 的活性和进行重新选举。</p>
+<h3 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h3><p>分布式锁的实现方式有很多种，比如 <code>Redis</code> 、数据库 、<code>zookeeper</code> 等。个人认为 <code>zookeeper</code> 在实现分布式锁这方面是非常非常简单的。</p>
+<p>上面我们已经提到过了 <strong>zk在高并发的情况下保证节点创建的全局唯一性</strong>，这玩意一看就知道能干啥了。实现互斥锁呗，又因为能在分布式的情况下，所以能实现分布式锁呗。</p>
+<p>如何实现呢？这玩意其实跟选主基本一样，我们也可以利用临时节点的创建来实现。</p>
+<p>首先肯定是如何获取锁，因为创建节点的唯一性，我们可以让多个客户端同时创建一个临时节点，<strong>创建成功的就说明获取到了锁</strong> 。然后没有获取到锁的客户端也像上面选主的非主节点创建一个 <code>watcher</code>进行节点状态的监听，如果这个互斥锁被释放了（可能获取锁的客户端宕机了，或者那个客户端主动释放了锁）可以调用回调函数重新获得锁。</p>
+<p>那能不能使用 <code>zookeeper</code> 同时实现 <strong>共享锁和独占锁</strong> 呢？答案是可以的，不过稍微有点复杂而已。</p>
+<p>还记得 <strong>有序的节点</strong> 吗？</p>
+<p>这个时候我规定所有创建节点必须有序，当你是读请求（要获取共享锁）的话，如果 <strong>没有比自己更小的节点，或比自己小的节点都是读请求</strong> ，则可以获取到读锁，然后就可以开始读了。<strong>若比自己小的节点中有写请求</strong> ，则当前客户端无法获取到读锁，只能等待前面的写请求完成。</p>
+<p>如果你是写请求（获取独占锁），若 <strong>没有比自己更小的节点</strong> ，则表示当前客户端可以直接获取到写锁，对数据进行修改。若发现 <strong>有比自己更小的节点，无论是读操作还是写操作，当前客户端都无法获取到写锁</strong> ，等待所有前面的操作完成。</p>
+<p>这就很好地同时实现了共享锁和独占锁，当然还有优化的地方，比如当一个锁得到释放它会通知所有等待的客户端从而造成 <strong>羊群效应</strong> 。此时你可以通过让等待的节点只监听他们前面的节点。</p>
+<p>具体怎么做呢？其实也很简单，你可以让 <strong>读请求监听比自己小的最后一个写请求节点，写请求只监听比自己小的最后一个节点</strong> ，感兴趣的小伙伴可以自己去研究一下。</p>
+<h3 id="命名服务"><a href="#命名服务" class="headerlink" title="命名服务"></a>命名服务</h3><p>如何给一个对象设置ID，大家可能都会想到 <code>UUID</code>，但是 <code>UUID</code> 最大的问题就在于它太长了。。。(太长不一定是好事，嘿嘿嘿)。那么在条件允许的情况下，我们能不能使用 <code>zookeeper</code> 来实现呢？</p>
+<p>我们之前提到过 <code>zookeeper</code> 是通过 <strong>树形结构</strong> 来存储数据节点的，那也就是说，对于每个节点的 <strong>全路径</strong>，它必定是唯一的，我们可以使用节点的全路径作为命名方式了。而且更重要的是，路径是我们可以自己定义的，这对于我们对有些有语意的对象的ID设置可以更加便于理解。</p>
+<h3 id="集群管理和注册中心"><a href="#集群管理和注册中心" class="headerlink" title="集群管理和注册中心"></a>集群管理和注册中心</h3><p>可能我们会有这样的需求，我们需要了解整个集群中有多少机器在工作，我们想对集群中的每台机器的运行时状态进行数据采集，对集群中机器进行上下线操作等等。</p>
+<p>而 <code>zookeeper</code> 天然支持的 <code>watcher</code> 和 临时节点能很好的实现这些需求。我们可以为每条机器创建临时节点，并监控其父节点，如果子节点列表有变动（我们可能创建删除了临时节点），那么我们可以使用在其父节点绑定的 <code>watcher</code> 进行状态监控和回调。</p>
+<p><img src="https://s2.loli.net/2022/05/26/wn96FaIbDCuGYiK.png" alt="image.png"></p>
+<p>至于注册中心也很简单，我们同样也是让 <strong>服务提供者</strong> 在 <code>zookeeper</code> 中创建一个临时节点并且将自己的 <code>ip、port、调用方式</code> 写入节点，当 <strong>服务消费者</strong> 需要进行调用的时候会 <strong>通过注册中心找到相应的服务的地址列表(IP端口什么的)</strong> ，并缓存到本地(方便以后调用)，当消费者调用服务时，不会再去请求注册中心，而是直接通过负载均衡算法从地址列表中取一个服务提供者的服务器调用服务。</p>
+<p>当服务提供者的某台服务器宕机或下线时，相应的地址会从服务提供者地址列表中移除。同时，注册中心会将新的服务地址列表发送给服务消费者的机器并缓存在消费者本机（当然你可以让消费者进行节点监听，我记得 <code>Eureka</code> 会先试错，然后再更新）。</p>
+<p><img src="https://s2.loli.net/2022/05/26/y8p5vY2SgZ4QbrH.png" alt="image.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Zhenhao Li</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://lzh66.github.io/2022/05/26/ZooKeeper/">https://lzh66.github.io/2022/05/26/ZooKeeper/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a><a class="post-meta__tags" href="/tags/RPC/">RPC</a><a class="post-meta__tags" href="/tags/ZooKeeper/">ZooKeeper</a></div><div class="post_share"><div class="social-share" data-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/05/24/%E5%88%86%E5%B8%83%E5%BC%8FID/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">分布式ID</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2022/05/21/RPC/" title="RPC"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-21</div><div class="title">RPC</div></div></a></div><div><a href="/2022/04/22/FastDFS%E2%80%94%E2%80%94%E4%B8%80%E6%AC%BE%E5%A5%BD%E7%94%A8%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" title="FastDFS——一款好用的分布式文件系统"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-22</div><div class="title">FastDFS——一款好用的分布式文件系统</div></div></a></div><div><a href="/2022/05/24/%E5%88%86%E5%B8%83%E5%BC%8FID/" title="分布式ID"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-24</div><div class="title">分布式ID</div></div></a></div><div><a href="/2022/05/16/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" title="分布式事务"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-16</div><div class="title">分布式事务</div></div></a></div><div><a href="/2022/05/23/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E5%92%8C%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/" title="读写分离和分库分表"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-23</div><div class="title">读写分离和分库分表</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://s2.loli.net/2022/04/22/IpxyD1gF2VqmwQB.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Zhenhao Li</div><div class="author-info__description">Beijing University of Posts and Telecommunications</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">10</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">16</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div></div><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/lzh66" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:lzhbupt@bupt.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">记录在学习过程中的所学所得～</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%89%B9%E7%82%B9"><span class="toc-number">1.</span> <span class="toc-text">特点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">2.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%87%8D%E8%A6%81%E6%A6%82%E5%BF%B5"><span class="toc-number">3.</span> <span class="toc-text">重要概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-model-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-number">3.1.</span> <span class="toc-text">Data model(数据模型)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#znode-%E6%95%B0%E6%8D%AE%E8%8A%82%E7%82%B9"><span class="toc-number">3.2.</span> <span class="toc-text">znode(数据节点)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#znode4%E7%A7%8D%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.2.1.</span> <span class="toc-text">znode4种类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#znode%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="toc-number">3.2.2.</span> <span class="toc-text">znode数据结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%88%E6%9C%AC-version"><span class="toc-number">3.3.</span> <span class="toc-text">版本(version)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ACL-%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6"><span class="toc-number">3.4.</span> <span class="toc-text">ACL(权限控制)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Watcher-%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E5%99%A8"><span class="toc-number">3.5.</span> <span class="toc-text">Watcher(事件监听器)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%9A%E8%AF%9D-Session"><span class="toc-number">3.6.</span> <span class="toc-text">会话(Session)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ZooKeeper%E9%9B%86%E7%BE%A4"><span class="toc-number">4.</span> <span class="toc-text">ZooKeeper集群</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ZooKeeper%E9%9B%86%E7%BE%A4%E8%A7%92%E8%89%B2"><span class="toc-number">4.1.</span> <span class="toc-text">ZooKeeper集群角色</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ZooKeeper%E9%9B%86%E7%BE%A4%E4%B8%AD%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%8A%B6%E6%80%81"><span class="toc-number">4.2.</span> <span class="toc-text">ZooKeeper集群中的服务器状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ZooKeeper%E9%9B%86%E7%BE%A4%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E6%98%AF%E5%A5%87%E6%95%B0%E5%8F%B0%EF%BC%9F"><span class="toc-number">4.3.</span> <span class="toc-text">ZooKeeper集群为什么最好是奇数台？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ZooKeeper%E9%80%89%E4%B8%BE%E7%9A%84%E8%BF%87%E5%8D%8A%E6%9C%BA%E5%88%B6%E9%98%B2%E6%AD%A2%E8%84%91%E8%A3%82"><span class="toc-number">4.4.</span> <span class="toc-text">ZooKeeper选举的过半机制防止脑裂</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ZooKeeper%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98"><span class="toc-number">5.</span> <span class="toc-text">ZooKeeper一致性问题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7%E5%8D%8F%E8%AE%AE%E5%92%8C%E7%AE%97%E6%B3%95"><span class="toc-number">5.1.</span> <span class="toc-text">一致性协议和算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2PC-%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4"><span class="toc-number">5.2.</span> <span class="toc-text">2PC(两阶段提交)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3PC-%E4%B8%89%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4"><span class="toc-number">5.3.</span> <span class="toc-text">3PC(三阶段提交)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Paxos%E7%AE%97%E6%B3%95"><span class="toc-number">5.4.</span> <span class="toc-text">Paxos算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#prepare-%E9%98%B6%E6%AE%B5"><span class="toc-number">5.4.1.</span> <span class="toc-text">prepare 阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#accept%E9%98%B6%E6%AE%B5"><span class="toc-number">5.4.2.</span> <span class="toc-text">accept阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#paxos%E7%AE%97%E6%B3%95%E7%9A%84%E6%AD%BB%E5%BE%AA%E7%8E%AF%E9%97%AE%E9%A2%98"><span class="toc-number">5.4.3.</span> <span class="toc-text">paxos算法的死循环问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ZAB"><span class="toc-number">5.5.</span> <span class="toc-text">ZAB</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ZooKeeper%E6%9E%B6%E6%9E%84"><span class="toc-number">5.5.1.</span> <span class="toc-text">ZooKeeper架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ZAB%E4%B8%AD%E7%9A%84%E4%B8%89%E4%B8%AA%E8%A7%92%E8%89%B2"><span class="toc-number">5.5.2.</span> <span class="toc-text">ZAB中的三个角色</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E5%B9%BF%E6%92%AD%E6%A8%A1%E5%BC%8F"><span class="toc-number">5.5.3.</span> <span class="toc-text">消息广播模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B4%A9%E6%BA%83%E6%81%A2%E5%A4%8D%E6%A8%A1%E5%BC%8F"><span class="toc-number">5.5.4.</span> <span class="toc-text">崩溃恢复模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ZooKeeper%E7%9A%84%E5%87%A0%E4%B8%AA%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">5.6.</span> <span class="toc-text">ZooKeeper的几个典型应用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%89%E4%B8%BB"><span class="toc-number">5.6.1.</span> <span class="toc-text">选主</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="toc-number">5.6.2.</span> <span class="toc-text">分布式锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%91%BD%E5%90%8D%E6%9C%8D%E5%8A%A1"><span class="toc-number">5.6.3.</span> <span class="toc-text">命名服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E5%92%8C%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83"><span class="toc-number">5.6.4.</span> <span class="toc-text">集群管理和注册中心</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/05/26/ZooKeeper/" title="ZooKeeper">ZooKeeper</a><time datetime="2022-05-26T03:16:37.000Z" title="Created 2022-05-26 11:16:37">2022-05-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/05/24/%E5%88%86%E5%B8%83%E5%BC%8FID/" title="分布式ID">分布式ID</a><time datetime="2022-05-24T01:57:03.000Z" title="Created 2022-05-24 09:57:03">2022-05-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/05/23/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E5%92%8C%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/" title="读写分离和分库分表">读写分离和分库分表</a><time datetime="2022-05-23T07:36:07.000Z" title="Created 2022-05-23 15:36:07">2022-05-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/05/21/RPC/" title="RPC">RPC</a><time datetime="2022-05-21T13:52:30.000Z" title="Created 2022-05-21 21:52:30">2022-05-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/05/21/Spring-Security/" title="Spring Security">Spring Security</a><time datetime="2022-05-21T01:54:23.000Z" title="Created 2022-05-21 09:54:23">2022-05-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By Zhenhao Li</div><div class="footer_custom_text"><p><a style="margin-inline:5px"target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为 Hexo" alt="HEXO"></a><a style="margin-inline:5px"target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用 Butterfly" alt="Butterfly"></a><a style="margin-inline:5px"target="_blank" href="https://www.jsdelivr.com/"><img src="https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&logo=jsDelivr" title="本站使用 Jsdelivr 为静态资源提供CDN加速" alt="Jsdelivr"></a><a style="margin-inline:5px"target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由 GitHub 托管" alt="GitHub"></a><a style="margin-inline:5px"target="_blank"href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" alt="img" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Switch Between Traditional Chinese And Simplified Chinese">繁</button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'zzuUe69MuYytsfqLD7wtAGjn-gzGzoHsz',
+      appKey: '4Nc7AJ9k3O0ysaPPzA7sc2w6',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
